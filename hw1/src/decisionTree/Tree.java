@@ -14,6 +14,7 @@ public class Tree
 		this.tRoot = root;
 	}
 
+
 	public Node getRoot()
 	{
 		return this.tRoot;
@@ -86,7 +87,7 @@ public class Tree
 			root.setAttr(bestAttr);
 			root.setThreshold(bestThreshold);
 
-/**
+/**			I don't know why it doesn't work: 
 			Node lc = new Node();
 			lc.setParent(root);
 			lc.setData(filter(root, bestAttr, bestThreshold, 0));

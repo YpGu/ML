@@ -11,13 +11,13 @@ public class Node
 	private int level;
 	private boolean leafNode;
 
-	private String label;			// class label if the node is a leaf node 
+	private String label;				// class label if the node is a leaf node 
 
-	private ArrayList<DataType> data;	// set of data in the node 
-	private ArrayList<Integer> usedAttrs;	// set of attributes used so far 
+	private ArrayList<DataType> data;		// set of data in the node 
+	private ArrayList<Integer> usedAttrs;		// set of attributes used so far 
 
-	private int attribute;			// current criterion for split 
-	private double threshold;		// current threshold for split 
+	private int attribute;				// current criterion for split 
+	private double threshold;			// current threshold for split 
 
 
 	public Node()

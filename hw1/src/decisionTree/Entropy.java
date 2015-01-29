@@ -1,5 +1,5 @@
 /**
-	Entropy class: calculate entropy
+	Entropy class: calculate entropy / information gain
 **/
 
 import java.util.*;
