@@ -7,10 +7,8 @@ import java.io.*;
 
 public class FileParser
 {
-//	public static ArrayList<DataType> readData(String fileDir, String delimiter)
 	public static int readData(String fileDir, String delimiter, ArrayList<DataType> res)
 	{
-//		ArrayList<DataType> res = new ArrayList<DataType>();
 		int numAttrs = -1;
 
 		try (BufferedReader br = new BufferedReader(new FileReader(fileDir)))
@@ -57,7 +55,6 @@ public class FileParser
 			e.printStackTrace();
 		}
 
-//		return res;
 		return numAttrs;
 	}
 }
