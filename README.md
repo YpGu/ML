@@ -1,2 +1,2 @@
 # ML
-Machine Learning 6140
+Machine Learning CS6140 15 Spring
