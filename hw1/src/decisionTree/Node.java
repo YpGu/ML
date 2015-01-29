@@ -114,6 +114,16 @@ public class Node
 		this.data = data;
 	}
 
+	public void setData(ArrayList<ArrayList<DataType>> data, int fold, int tot)
+	{
+		ArrayList<DataType> dt = new ArrayList<DataType>();
+		for(int i = 0; i < tot; i++)
+			if (i != fold)
+				for (int j = 0; j < data.get(i).size(); j++)
+					dt.add(data.get(i).get(j));
+		this.data = dt;
+	}
+
 	public void addData(DataType datum)
 	{
 		this.data.add(datum);

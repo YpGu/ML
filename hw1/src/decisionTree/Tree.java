@@ -25,12 +25,16 @@ public class Tree
 		this.tRoot = tRoot;
 	}
 
-	public void buildTree(Node root)
+	public void buildTree(Node root, boolean display)
 	{
-		System.out.println("=============================================");
-		System.out.println("Level " + root.getLevel() + "\tSize = " + root.getData().size() + "\tUsed " + root.getUsedAttr().size() + " attribute(s)");
-		if (root.getUsedAttr().size() != 0)
-			System.out.println("Those attributes are: " + root.getUsedAttr());
+		if (display)
+		{
+			System.out.println("=============================================");
+			System.out.println("Level " + root.getLevel() + "\tSize = " + root.getData().size() + "\tUsed " + root.getUsedAttr().size() + " attribute(s)");
+
+			if (root.getUsedAttr().size() != 0)
+				System.out.println("Those attributes are: " + root.getUsedAttr());
+		}
 
 		// check if stop criterion is met 
 		if (root.getData().size() == 0)
@@ -43,8 +47,8 @@ public class Tree
 		{
 			root.setLeaf(true);
 			majorityVote(root);
-			System.out.println("We arrive at a leaf node because we used up all attributes!");
-			System.out.println("Label at this leaf is " + root.getLabel() + ".");
+			if (display)
+				System.out.println("We arrive at a leaf node because we used up all attributes!\nLabel at this leaf is " + root.getLabel() + ".");
 			return;
 		}
 
@@ -58,7 +62,8 @@ public class Tree
 			if (root.getUsedAttr().contains(i))
 				continue;
 
-			System.out.println("  Checking Attribute " + i);
+			if (display)
+				System.out.println("  Checking Attribute " + i);
 
 			// select threshold for feature #i 
 			for (int j = 0; j < root.getData().size(); j++)
@@ -73,12 +78,16 @@ public class Tree
 				}
 			}
 
-			System.out.println("    Best info gain so far = " + maxInfoGain);
+			if (display)
+				System.out.println("    Best info gain so far = " + maxInfoGain);
 		}
 
-		System.out.printf("bestAttr = %d, ", bestAttr);
-		System.out.printf("bestThreshold = %f, ", bestThreshold);
-		System.out.println("maxInfoGain = " + maxInfoGain);
+		if (display)
+		{
+			System.out.printf("bestAttr = %d, ", bestAttr);
+			System.out.printf("bestThreshold = %f, ", bestThreshold);
+			System.out.println("maxInfoGain = " + maxInfoGain);
+		}
 
 		// set root node 
 		if (maxInfoGain != 0)
@@ -129,17 +138,18 @@ public class Tree
 			);
 			root.setRChild(rc);
 
-			System.out.println("Children size: " + root.getLChild().getData().size() + " " + root.getRChild().getData().size());
+			if (display)
+				System.out.println("Children size: " + root.getLChild().getData().size() + " " + root.getRChild().getData().size());
 
-			buildTree(root.getLChild());
-			buildTree(root.getRChild());
+			buildTree(root.getLChild(), false);
+			buildTree(root.getRChild(), false);
 		}
 		else
 		{
 			root.setLeaf(true);
 			majorityVote(root);
-			System.out.println("We arrive at a leaf node because IG = 0!");
-			System.out.println("Label at this leaf is " + root.getLabel() + ".");
+			if (display)
+				System.out.println("We arrive at a leaf node because IG = 0!\nLabel at this leaf is " + root.getLabel() + ".");
 			return;
 		}
 

@@ -7,6 +7,8 @@ import java.io.*;
 
 public class FileParser
 {
+	private static Random randGenerator = new Random(0);
+
 	public static int readData(String fileDir, String delimiter, ArrayList<DataType> res)
 	{
 		int numAttrs = -1;
@@ -57,4 +59,20 @@ public class FileParser
 
 		return numAttrs;
 	}
+
+	public static void crossValidation(ArrayList<DataType> data, ArrayList<ArrayList<DataType>> cv, int num)
+	{
+		for (int i = 0; i < num; i++)
+		{
+			cv.add(new ArrayList<DataType>());
+		}
+
+		for (int i = 0; i < data.size(); i++)
+		{
+			int ind = i%num;
+//			int ind = randGenerator.nextInt(num);
+			cv.get(ind).add(data.get(i));
+		}
+	}
+		
 }
