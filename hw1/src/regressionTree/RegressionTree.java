@@ -11,7 +11,7 @@ public class RegressionTree
 	public final static int NUM_CROSS_VALIDATION = 10;
 	public final static boolean DISPLAY = false;
 
-	public static void evaluate(Tree tree, Node root, ArrayList<ArrayList<DataType>> cv, int fold)
+	public static double evaluate(Tree tree, Node root, ArrayList<ArrayList<DataType>> cv, int fold)
 	{
 		double trainMSE = 0, testMSE = 0;
 		int trainTot = 0, testTot = 0;
@@ -61,6 +61,8 @@ public class RegressionTree
 
 		System.out.println(trainRes);
 		System.out.println(testRes);
+
+		return testMSE;
 	}
 
 	public static void main(String[] args)
@@ -84,6 +86,8 @@ public class RegressionTree
 
 		for (double eta: etas)
 		{
+			ArrayList<Double> testMSEs = new ArrayList<Double>();
+
 			System.out.println("\nUsing eta " + eta);
 			for (int i = 0; i < NUM_CROSS_VALIDATION; i++)
 			{
@@ -95,8 +99,10 @@ public class RegressionTree
 				if (DISPLAY)
 					System.out.println("=============================================\nTraining ends.");
 
-				evaluate(tree, root, cv, i);
+				testMSEs.add(evaluate(tree, root, cv, i));
 			}
+
+			StandardDeviation.calcSD(testMSEs);
 		}
 
 		return;
