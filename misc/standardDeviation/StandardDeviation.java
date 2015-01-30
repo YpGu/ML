@@ -1,4 +1,5 @@
 import java.util.*;
+import java.lang.*;
 
 public class StandardDeviation
 {
@@ -11,6 +12,7 @@ public class StandardDeviation
 			ave += arr.get(i);
 		}
 		ave /= arr.size();
+		System.out.println("Average = " + ave);
 
 		for (int i = 0; i < arr.size(); i++)
 		{
@@ -32,7 +34,16 @@ public class StandardDeviation
 		ArrayList<Double> arr = new ArrayList<Double>();
 		for (int i = 0; i < args.length; i++)
 		{
-			arr.add(Double.parseDouble(args[i]));
+			try
+			{
+				arr.add(Double.parseDouble(args[i]));
+			}
+			catch (NumberFormatException e)
+			{
+				String[] parts = args[i].split("/");
+				double val = Double.parseDouble(parts[0]) / Double.parseDouble(parts[1]);
+				arr.add(val);
+			}
 		}
 		calcSD(arr);
 
