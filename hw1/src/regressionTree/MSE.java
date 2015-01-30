@@ -1,5 +1,5 @@
 /**
-	MSE class: calculate entropy / information gain
+	MSE class: calculate MSE (mean squared error) 
 **/
 
 import java.util.*;
