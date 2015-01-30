@@ -30,6 +30,10 @@ public class StandardDeviation
 			System.out.println("Wrong Arguments.");
 			return;
 		}
+		else
+		{
+			System.out.println(args.length + " numbers.");
+		}
 
 		ArrayList<Double> arr = new ArrayList<Double>();
 		for (int i = 0; i < args.length; i++)
