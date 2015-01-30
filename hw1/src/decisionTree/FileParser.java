@@ -13,6 +13,7 @@ public class FileParser
 	{
 		int numAttrs = -1;
 
+		// read dimension
 		try (BufferedReader br = new BufferedReader(new FileReader(fileDir)))
 		{
 			String currentLine = br.readLine();
@@ -24,6 +25,55 @@ public class FileParser
 			e.printStackTrace();
 		}
 
+		// read max/min (to do normalization) 
+		ArrayList<Double> minValue = new ArrayList<Double>(10);
+		ArrayList<Double> maxValue = new ArrayList<Double>(10);
+		ArrayList<Boolean> minEqualsMax = new ArrayList<Boolean>();
+		try (BufferedReader br = new BufferedReader(new FileReader(fileDir)))
+		{
+			String currentLine;
+			int lineID = 0;
+			while ((currentLine = br.readLine()) != null)
+			{
+				if (currentLine.equals(""))
+					continue;
+
+				// parse line here
+				String[] tokens = currentLine.split(delimiter);
+
+				// read min/max of attributes 
+				for (int i = 0; i < numAttrs; i++)
+				{
+					double curAttr = Double.parseDouble(tokens[i].trim());
+					if (lineID != 0)
+					{
+						if (curAttr > maxValue.get(i))
+							maxValue.set(i, curAttr);
+						if (curAttr < minValue.get(i))
+							minValue.set(i, curAttr);
+					}
+					else
+					{
+						minValue.add(i, curAttr);
+						maxValue.add(i, curAttr);
+					}
+				}
+				lineID++;
+			}
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		for (int i = 0; i < numAttrs; i++)
+		{
+			if (minValue.get(i) == maxValue.get(i))
+				minEqualsMax.add(i, true);
+			else
+				minEqualsMax.add(i, false);
+		}
+
+		// read raw data and do normalization 
 		try (BufferedReader br = new BufferedReader(new FileReader(fileDir)))
 		{
 			String currentLine;
@@ -37,10 +87,12 @@ public class FileParser
 				// parse line here
 				String[] tokens = currentLine.split(delimiter);
 
-				// read attributes 
+				// read attributes and do normalizatio 
 				for (int i = 0; i < numAttrs; i++)
 				{
 					double curAttr = Double.parseDouble(tokens[i].trim());
+					if (!minEqualsMax.get(i))
+						curAttr = (curAttr - minValue.get(i)) / (maxValue.get(i) - minValue.get(i));
 					dt.addAttr(curAttr);
 				}
 

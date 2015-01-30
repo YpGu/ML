@@ -25,7 +25,7 @@ public class Tree
 		this.tRoot = tRoot;
 	}
 
-	public void buildTree(Node root, boolean display)
+	public void buildTree(Node root, boolean display, double eta)
 	{
 		if (display)
 		{
@@ -52,8 +52,18 @@ public class Tree
 			return;
 		}
 
+		// early stop strategy
+		if (root.getData().size() <= eta)
+		{
+			root.setLeaf(true);
+			majorityVote(root);
+			if (display)
+				System.out.println("We arrive at a leaf node because early stop criterion is met!");
+			return;
+		}
+
 		// root is not leaf node 
-		double maxInfoGain = -100;
+		double maxInfoGain = -Double.MAX_VALUE;
 		int bestAttr = -1;
 		double bestThreshold = 0;
 
@@ -141,8 +151,8 @@ public class Tree
 			if (display)
 				System.out.println("Children size: " + root.getLChild().getData().size() + " " + root.getRChild().getData().size());
 
-			buildTree(root.getLChild(), false);
-			buildTree(root.getRChild(), false);
+			buildTree(root.getLChild(), display, eta);
+			buildTree(root.getRChild(), display, eta);
 		}
 		else
 		{

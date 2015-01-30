@@ -3,6 +3,7 @@
 **/
 
 import java.util.*;
+import java.io.*;
 
 public class DecisionTree
 {
@@ -10,7 +11,7 @@ public class DecisionTree
 	public final static int NUM_CROSS_VALIDATION = 10;
 	public final static boolean DISPLAY = false;
 
-	public static void evaluate(Tree tree, Node root, ArrayList<ArrayList<DataType>> cv, int fold)
+	public static double evaluate(Tree tree, Node root, ArrayList<ArrayList<DataType>> cv, int fold)
 	{
 		int trainCor = 0, testCor = 0;
 		int trainTot = 0, testTot = 0;
@@ -22,7 +23,8 @@ public class DecisionTree
 				{
 					if (cv.get(i).get(j).getLabel().equals(tree.query(cv.get(i).get(j), root)))
 						trainCor++;
-//					System.out.println("Real Label = " + rootData.get(i).getLabel() + " Predicted Label = " + tree.query(rootData.get(i), root));
+//					System.out.println("Real Label = " + rootData.get(i).getLabel()");
+//					System.out.println("Predicted Label = " + tree.query(rootData.get(i), root));
 				}
 				trainTot += cv.get(i).size();
 			}
@@ -32,13 +34,33 @@ public class DecisionTree
 				{
 					if (cv.get(i).get(j).getLabel().equals(tree.query(cv.get(i).get(j), root)))
 						testCor++;
-//					System.out.println("Real Label = " + rootData.get(i).getLabel() + " Predicted Label = " + tree.query(rootData.get(i), root));
+//					System.out.println("Real Label = " + rootData.get(i).getLabel()");
+//					System.out.println("Predicted Label = " + tree.query(rootData.get(i), root));
 				}
 				testTot += cv.get(i).size();
 			}
 		}
+
+		String trainRes = "Training accuracy = " + trainCor + "/" + trainTot + "\n";
+		String testRes = "Testing accuracy = " + testCor + "/" + testTot + "\n";
+		try
+		{
+			File file = new File("output.txt");
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file, true));
+			bw.write(trainRes);
+			bw.write(testRes);
+			bw.close();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+
 		System.out.println("Training accuracy = " + trainCor + "/" + trainTot);
 		System.out.println("Testing accuracy = " + testCor + "/" + testTot);
+
+		double testAcc = (double)testCor/testTot;
+		return testAcc;
 	}
 
 	public static void main(String[] args)
@@ -58,18 +80,28 @@ public class DecisionTree
 		ArrayList<ArrayList<DataType>> cv = new ArrayList<ArrayList<DataType>>();
 		FileParser.crossValidation(rootData, cv, NUM_CROSS_VALIDATION);
 
-		for (int i = 0; i < NUM_CROSS_VALIDATION; i++)
+		double[] etas = new double[]{0.05, 0.1, 0.15, 0.2, 0.25};
+
+		ArrayList<Double> testAcc = new ArrayList<Double>();
+
+		for (double eta: etas)
 		{
-			System.out.println("\n======= Cross Validation: Fold " + i + "/" + NUM_CROSS_VALIDATION + " =======");
-			root.setData(cv, i, NUM_CROSS_VALIDATION);
+			System.out.println("\nUsing eta: " + eta);
+			for (int i = 0; i < NUM_CROSS_VALIDATION; i++)
+			{
+				System.out.println("\n======= Cross Validation: Fold " + i + "/" + NUM_CROSS_VALIDATION + " =======");
+				root.setData(cv, i, NUM_CROSS_VALIDATION);
 
-			Tree tree = new Tree(root);
-			tree.buildTree(tree.getRoot(), DISPLAY);
-			if (DISPLAY)
-				System.out.println("=============================================\nTraining ends.");
+				Tree tree = new Tree(root);
+				tree.buildTree(tree.getRoot(), DISPLAY, eta * root.getData().size());
+				if (DISPLAY)
+					System.out.println("=============================================\nTraining ends.");
 
-			evaluate(tree, root, cv, i);
+				testAcc.add(evaluate(tree, root, cv, i));
+			}
 		}
+
+		StandardDeviation.calcSD(testAcc);
 
 		return;
 	}
