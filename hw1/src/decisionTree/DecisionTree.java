@@ -21,10 +21,10 @@ public class DecisionTree
 			{
 				for (int j = 0; j < cv.get(i).size(); j++)
 				{
-					if (cv.get(i).get(j).getLabel().equals(tree.query(cv.get(i).get(j), root)))
+					String groundTruthLabel = cv.get(i).get(j).getLabel();
+					String predictedLabel = tree.query(cv.get(i).get(j), root);
+					if (groundTruthLabel.equals(predictedLabel))
 						trainCor++;
-//					System.out.println("Real Label = " + rootData.get(i).getLabel()");
-//					System.out.println("Predicted Label = " + tree.query(rootData.get(i), root));
 				}
 				trainTot += cv.get(i).size();
 			}
@@ -32,10 +32,10 @@ public class DecisionTree
 			{
 				for (int j = 0; j < cv.get(i).size(); j++)
 				{
-					if (cv.get(i).get(j).getLabel().equals(tree.query(cv.get(i).get(j), root)))
+					String groundTruthLabel = cv.get(i).get(j).getLabel();
+					String predictedLabel = tree.query(cv.get(i).get(j), root);
+					if (groundTruthLabel.equals(predictedLabel))
 						testCor++;
-//					System.out.println("Real Label = " + rootData.get(i).getLabel()");
-//					System.out.println("Predicted Label = " + tree.query(rootData.get(i), root));
 				}
 				testTot += cv.get(i).size();
 			}
