@@ -18,7 +18,7 @@ public class StandardDeviation
 		{
 			ss += (arr.get(i) - ave) * (arr.get(i) - ave);
 		}
-		ss /= arr.size();
+		ss /= (arr.size()-1);
 
 		System.out.println("Standard Deviation is " + Math.sqrt(ss));
 	}
