@@ -66,6 +66,7 @@ public class FileParser
 					double curAttr = Double.parseDouble(tokens[i].trim());
 					inputs[lineID][i] = curAttr;
 				}
+				inputs[lineID][i] = 1;
 				outputs[lineID] = Double.parseDouble(tokens[i].trim());
 				lineID++;
 			}
@@ -77,6 +78,24 @@ public class FileParser
 
 		return;
 	}
+
+	// Output
+	public static void output(String outputDir, double[] arr)
+	{
+		int N = arr.length;
+		try (PrintWriter writer = new PrintWriter(outputDir, "UTF-8"))
+		{
+			for (int x = 0; x < N; x++)
+				writer.printf("%d\t%f\n", x, arr[x]);
+		}
+		catch (FileNotFoundException | UnsupportedEncodingException e)
+		{
+			e.printStackTrace();
+		}
+
+		return;
+	}
+
 
 /*	public static void crossValidation(ArrayList<DataType> data, ArrayList<ArrayList<DataType>> cv, int num)
 	{

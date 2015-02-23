@@ -14,7 +14,6 @@ public class LinearRegression
 	public final static int MAX_ITER = 1000;				// Maximum Number of Iterations 
 	public final static int NUM_FOLD = 10;					// n-fold 
 	public final static String DELIMITER = ",";				// Delimiter for input files 
-	public final static boolean useBias = false;				// use w_0 or not 
 	public static Random rand;
 	public static Scanner sc;
 
@@ -33,7 +32,7 @@ public class LinearRegression
 			lr = 0.0004;
 			tolerance = 0.005;
 		}
-		else if (fileDir.contains("ocncrete"))
+		else if (fileDir.contains("concrete"))
 		{
 			lr = 0.0007;
 			tolerance = 0.0001;
@@ -47,7 +46,7 @@ public class LinearRegression
 		NUM_FEATURES = FileParser.readNumOfFeatures(fileDir, ",");
 		NUM_INSTANCES = FileParser.readNumOfInstances(fileDir, ",");
 
-		data = new double[NUM_INSTANCES][NUM_FEATURES];
+		data = new double[NUM_INSTANCES][NUM_FEATURES+1];
 		obs = new double[NUM_INSTANCES];
 		w = new double[NUM_FEATURES+1];
 		for (int i = 0; i < NUM_FEATURES+1; i++)
@@ -56,40 +55,40 @@ public class LinearRegression
 		return;
 	}
 
-	public static void normalize(int fold, boolean isTrain)
+	public static void normalize(int fold)
 	{
 		// z-score normalization 
 		double[] aver = new double[NUM_FEATURES];
+		for (int i = 0; i < NUM_FEATURES; i++)
+			aver[i] = 0;
 		double[] std = new double[NUM_FEATURES];
-		int deno = 0;
+		for (int i = 0; i < NUM_FEATURES; i++)
+			std[i] = 0;
 		for (int i = 0; i < NUM_FEATURES; i++)
 		{
+			int deno = 0;
 			for (int j = 0; j < NUM_INSTANCES; j++)
 			{
-				if (j%NUM_FOLD != fold && isTrain)
-				{
-					aver[i] += data[j][i];
-					deno += 1;
-				}
-				else if (j%NUM_FOLD == fold && !isTrain)
+				if (j%NUM_FOLD != fold)
 				{
 					aver[i] += data[j][i];
 					deno += 1;
 				}
 			}
 
-			deno /= NUM_FEATURES;
 			aver[i] /= deno;
 		}
 
 		for (int i = 0; i < NUM_FEATURES; i++)
 		{
+			int deno = 0;
 			for (int j = 0; j < NUM_INSTANCES; j++)
 			{
-				if (j%NUM_FOLD != fold && isTrain)
+				if (j%NUM_FOLD != fold)
+				{
 					std[i] += (data[j][i] - aver[i]) * (data[j][i] - aver[i]);
-				else if (j%NUM_FOLD == fold && !isTrain)
-					std[i] += (data[j][i] - aver[i]) * (data[j][i] - aver[i]);
+					deno += 1;
+				}
 			}
 
 			std[i] /= (deno-1);
@@ -101,20 +100,20 @@ public class LinearRegression
 			{
 				for (int j = 0; j < NUM_INSTANCES; j++)
 				{
-					if (j%NUM_FOLD != fold && isTrain)
+//					if (j%NUM_FOLD != fold)
 						data[j][i] = (data[j][i] - aver[i]) / std[i];
-					else if (j%NUM_FOLD == fold && !isTrain)
-						data[j][i] = (data[j][i] - aver[i]) / std[i];
+//					else if (j%NUM_FOLD == fold)
+//						data[j][i] = (data[j][i] - aver[i]) / std[i];
 				}
 			}
 			else
 			{
 				for (int j = 0; j < NUM_INSTANCES; j++)
 				{
-					if (j%NUM_FOLD != fold && isTrain)
+//					if (j%NUM_FOLD != fold)
 						data[j][i] = 0;
-					else if (j%NUM_FOLD != fold && !isTrain)
-						data[j][i] = 0;
+//					else if (j%NUM_FOLD != fold)
+//						data[j][i] = 0;
 				}
 			}
 		}
@@ -131,10 +130,8 @@ public class LinearRegression
 			if (j%NUM_FOLD != fold)
 			{
 				double ej = obs[j];
-				for (int i = 0; i < NUM_FEATURES; i++)
+				for (int i = 0; i < NUM_FEATURES+1; i++)
 					ej -= w[i] * data[j][i];
-				if (useBias)
-					ej -= w[NUM_FEATURES];
 				res += ej * ej;
 				deno += 1;
 			}
@@ -154,10 +151,8 @@ public class LinearRegression
 			if (j%NUM_FOLD == fold)
 			{
 				double ej = obs[j];
-				for (int i = 0; i < NUM_FEATURES; i++)
+				for (int i = 0; i < NUM_FEATURES+1; i++)
 					ej -= w[i] * data[j][i];
-				if (useBias)
-					ej -= w[NUM_FEATURES];
 				res += ej * ej;
 				deno += 1;
 			}
@@ -180,7 +175,7 @@ public class LinearRegression
 //			System.out.println("Iter " + iter);
 
 			// empty gradients
-			for (int i = 0; i < NUM_FEATURES; i++)
+			for (int i = 0; i < NUM_FEATURES+1; i++)
 				grad_w[i] = 0;
 
 			// calculate derivatives 
@@ -188,28 +183,27 @@ public class LinearRegression
 			{
 				if (j%NUM_FOLD != fold)
 				{
-					double sqe = obs[j];
-					for (int i = 0; i < NUM_FEATURES; i++)
-						sqe -= w[i] * data[j][i];
-					if (useBias)
-						sqe -= w[NUM_FEATURES];
+					double ej = obs[j];
+					for (int i = 0; i < NUM_FEATURES+1; i++)
+						ej -= w[i] * data[j][i];
 
-					for (int i = 0; i < NUM_FEATURES; i++)
-						grad_w[i] -= 2 * sqe * data[j][i];
-					if (useBias)
-						grad_w[NUM_FEATURES] -= 2 * sqe;
+					for (int i = 0; i < NUM_FEATURES+1; i++)
+						grad_w[i] -= ej * data[j][i];
 				}
 			}
 
 			// update
 			for (int i = 0; i < NUM_FEATURES+1; i++)
-				w[i] -= 2 * lr * grad_w[i];
+				w[i] -= lr * grad_w[i];
+
+//			System.out.println(w[NUM_FEATURES]);
+//			int doge = sc.nextInt();
 
 
 			// compare objective functions 
 			newObj = calcTrainingRMSE(fold);
 			double rate = Math.abs(newObj - oldObj);
-//			System.out.println("  Rate = " + rate);
+//			System.out.println("  New Obj = " + newObj);
 			if (rate <= tolerance && iter > 0)
 				break;
 			oldObj = newObj;
@@ -234,19 +228,27 @@ public class LinearRegression
 
 		FileParser.readData(fileDir, ",", data, obs);
 
-		normalize(fold, true);
-		normalize(fold, false);
+//		System.out.println("Raw Data:");
+//		for (int i = 0; i < 10; i++)
+//			System.out.printf("%f\t", data[i][6]);
+		normalize(fold);
+//		System.out.println("\nNormalized Data:");
+//		for (int i = 0; i < 10; i++)
+//			System.out.printf("%f\t", data[i][6]);
+//		System.out.println(" ");
+
 		train(fold);
 
-//		System.out.println("w_i's: ");
-//		for (int i = 0; i < NUM_FEATURES; i++)
-//			System.out.println(w[i]);
 
 		System.out.println("-----------------------------------");
 		double res = calcTestingRMSE(fold);
 		System.out.println("Testing RMSE = " + res);
 		res = calcTrainingRMSE(fold);
 		System.out.println("Training RMSE = " + res);
+
+		FileParser.output("./res/weight." + fold, w);
+
+		FileParser.output("./res/y", obs);
 
 /*
 		for (int i = 0; i < NUM_INSTANCES; i++)
