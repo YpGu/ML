@@ -153,6 +153,35 @@ public class FileParser
 		double[][] testLabels,
 		int fold
 	) {
+		ArrayList<Integer> trList = new ArrayList<Integer>();
+		for (int i = 0; i < allData.length; i++) {
+			trList.add(i);
+		}
+		Collections.shuffle(trList);
+
+		for (int i = 0; i < allData.length; i++) {
+			int j = trList.get(i);
+			if (i < trainData.length) {
+				trainData[i] = allData[j];
+				trainLabels[i][0] = allLabels[j][0];
+			}
+			else {
+				testData[i-trainData.length] = allData[j];
+				testLabels[i-trainData.length][0] = allLabels[j][0];
+			}
+		}
+	}
+/*
+	public static void 
+	crossValidation(
+		double[][] allData,
+		double[][] allLabels,
+		double[][] trainData,
+		double[][] trainLabels,
+		double[][] testData,
+		double[][] testLabels,
+		int fold
+	) {
 		int trI = 0, teI = 0;
 		for (int i = 0; i < allData.length; i++) {
 			int ind = i%RidgeRegression.NUM_OF_FOLDS;
@@ -170,4 +199,5 @@ public class FileParser
 
 		return;
 	}
+*/
 }

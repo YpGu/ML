@@ -32,7 +32,6 @@ public class Solver
 		for (int i = 0; i < arrZ[0].length; i++)
 			I.set(i,i,1);
 		Matrix T = new Matrix(arrT);					// m*1
-printMat(T);
 		Matrix w = ( ( ZT.times(Z).plus(I.times(lambda)) ).inverse() ).times(ZT).times(T);
 
 		// update weights (result) 

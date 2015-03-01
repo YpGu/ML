@@ -43,14 +43,15 @@ public class RidgeRegression
 	run() {
 		for (int fold = 0; fold < NUM_OF_FOLDS; fold++) {
 
-			if (fold != 0)
-				break;
-
 			System.out.println("-------- Fold " + fold + " --------");
 
-			testData = new double[(int)(NUM_OF_INSTANCES-fold-1)/10+1][NUM_OF_FEATURES*POWER]; 
+/*			testData = new double[(int)(NUM_OF_INSTANCES-fold-1)/10+1][NUM_OF_FEATURES*POWER]; 
 			testLabels = new double[(int)(NUM_OF_INSTANCES-fold-1)/10+1][1];
-
+			trainData = new double[NUM_OF_INSTANCES-testData.length][NUM_OF_FEATURES*POWER];
+			trainLabels = new double[NUM_OF_INSTANCES-testData.length][1];
+*/
+			testData = new double[NUM_OF_INSTANCES/10][NUM_OF_FEATURES*POWER];
+			testLabels = new double[NUM_OF_INSTANCES/10][1];
 			trainData = new double[NUM_OF_INSTANCES-testData.length][NUM_OF_FEATURES*POWER];
 			trainLabels = new double[NUM_OF_INSTANCES-testData.length][1];
 
@@ -58,8 +59,8 @@ public class RidgeRegression
 
 			Solver.sol(trainData, trainLabels, lambda, weights);
 
-			for (int i = 0; i < weights.length; i++)
-				System.out.println(weights[i]);
+	//		for (int i = 0; i < weights.length; i++)
+	//			System.out.println(weights[i]);
 
 			Evaluation.evaluate(trainData, trainLabels, testData, testLabels, weights);
 
