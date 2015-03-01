@@ -3,6 +3,7 @@
 **/
 
 import java.util.*;
+import java.io.*;
 
 public class RidgeRegression
 {
@@ -85,6 +86,19 @@ public class RidgeRegression
 		System.out.println("Average Training RMSE = " + averTrRMSE);
 		System.out.println("Average Testing RMSE = " + averTeRMSE);
 
+		try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter("./TrRMSE9", true)))) {
+			writer.printf("%f\n", averTrRMSE);
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter("./TeRMSE9", true)))) {
+			writer.printf("%f\n", averTeRMSE);
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	// main method 
