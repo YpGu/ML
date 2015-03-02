@@ -88,18 +88,26 @@ public class FileParser
 	// pro-processing: center data
 	public static void
 	center(
-		double[][] data
+		double[][] trainData,
+		double[][] testData
 	) {
-		double[] aver = new double[data[0].length];
-		for (int j = 0; j < data[0].length; j++) {
-			for (int i = 0; i < data.length; i++) {
-				aver[j] += data[i][j];
+		int M = trainData[0].length;
+		double[] aver = new double[M];
+		for (int j = 0; j < M; j++) {
+			for (int i = 0; i < trainData.length; i++) {
+				aver[j] += trainData[i][j];
 			}
-			aver[j] /= data[0].length;
+			aver[j] /= trainData.length;
 		}
-		for (int i = 0; i < data.length; i++) {
-			for (int j = 0; j < data[0].length; j++) {
-				data[i][j] -= aver[j];
+
+		for (int j = 0; j < M; j++) {
+			for (int i = 0; i < trainData.length; i++) {
+				trainData[i][j] -= aver[j];
+			}
+		}
+		for (int j = 0; j < M; j++) {
+			for (int i = 0; i < testData.length; i++) {
+				testData[i][j] -= aver[j];
 			}
 		}
 
@@ -142,6 +150,7 @@ public class FileParser
 		return;
 	}
 
+	/*
 	// split data into training and testing 
 	public static void 
 	crossValidation(
@@ -157,7 +166,7 @@ public class FileParser
 		for (int i = 0; i < allData.length; i++) {
 			trList.add(i);
 		}
-		Collections.shuffle(trList);
+		Collections.shuffle(trList, new Random(10));
 
 		for (int i = 0; i < allData.length; i++) {
 			int j = trList.get(i);
@@ -171,7 +180,9 @@ public class FileParser
 			}
 		}
 	}
-/*
+	*/
+
+//	/*
 	public static void 
 	crossValidation(
 		double[][] allData,
@@ -192,12 +203,12 @@ public class FileParser
 			}
 			else {
 				testData[teI] = allData[i];
-				testData[teI][0] = allLabels[i][0];
+				testLabels[teI][0] = allLabels[i][0];
 				teI++;
 			}
 		}
 
 		return;
 	}
-*/
+//	*/
 }

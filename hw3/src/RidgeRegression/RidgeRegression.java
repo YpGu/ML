@@ -55,19 +55,23 @@ public class RidgeRegression
 			if (DISPLAY)
 				System.out.println("-------- Fold " + fold + " --------");
 
-/*			testData = new double[(int)(NUM_OF_INSTANCES-fold-1)/10+1][NUM_OF_FEATURES*POWER]; 
+//	/*
+			testData = new double[(int)(NUM_OF_INSTANCES-fold-1)/10+1][NUM_OF_FEATURES*POWER]; 
 			testLabels = new double[(int)(NUM_OF_INSTANCES-fold-1)/10+1][1];
 			trainData = new double[NUM_OF_INSTANCES-testData.length][NUM_OF_FEATURES*POWER];
 			trainLabels = new double[NUM_OF_INSTANCES-testData.length][1];
-*/
+//	*/
+	/*
 			testData = new double[NUM_OF_INSTANCES/10][NUM_OF_FEATURES*POWER];
 			testLabels = new double[NUM_OF_INSTANCES/10][1];
 			trainData = new double[NUM_OF_INSTANCES-testData.length][NUM_OF_FEATURES*POWER];
 			trainLabels = new double[NUM_OF_INSTANCES-testData.length][1];
-
+	*/
 			FileParser.crossValidation(allData, allLabels, trainData, trainLabels, testData, testLabels, fold);
+			FileParser.center(trainData, testData);
 
-			Solver.sol(trainData, trainLabels, lambda, weights);
+//			Solver.sol(trainData, trainLabels, lambda, weights);
+			Solver.sol_gd(trainData, trainLabels, lambda, weights, 0.001);
 
 	//		for (int i = 0; i < weights.length; i++)
 	//			System.out.println(weights[i]);
@@ -86,14 +90,15 @@ public class RidgeRegression
 		System.out.println("Average Training RMSE = " + averTrRMSE);
 		System.out.println("Average Testing RMSE = " + averTeRMSE);
 
-		try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter("./TrRMSE9", true)))) {
+		// todo: modify output path automatically 
+		try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter("./res-RMSE-tr9", true)))) {
 			writer.printf("%f\n", averTrRMSE);
 		}
 		catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter("./TeRMSE9", true)))) {
+		try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter("./res-RMSE-te9", true)))) {
 			writer.printf("%f\n", averTeRMSE);
 		}
 		catch (IOException e) {
@@ -115,7 +120,6 @@ public class RidgeRegression
 
 		init(args);
 		FileParser.readData(fileDir, ",", allData, allLabels, POWER);
-		FileParser.center(allData);
 		run();
 	}
 }
