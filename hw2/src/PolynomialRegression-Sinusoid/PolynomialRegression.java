@@ -51,7 +51,7 @@ public class PolynomialRegression
 	// run
 	public static void
 	run() {
-		FileParser.center(trainData, testData);
+//		FileParser.center(trainData, testData);
 
 		Solver.sol(trainData, trainLabels, weights);
 
