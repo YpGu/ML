@@ -109,7 +109,7 @@ public class SparseMatrix
 	}
 
 	public void 
-	update() {
+	update(Set<String> wordDict) {
 		// init dict set
 		for (Map.Entry<String, Map<String, Double>> e: mat.entrySet()) {
 			String x = e.getKey();
@@ -118,9 +118,9 @@ public class SparseMatrix
 				String y = f.getKey();
 				double v = f.getValue();
 				xDict.add(x);
-				yDict.add(y);
 			}
 		}
+		yDict = wordDict;
 
 		// init neighbor set
 		for (String s: xDict) {
@@ -139,12 +139,12 @@ public class SparseMatrix
 			for (Map.Entry<String, Double> f: m.entrySet()) {
 				String y = f.getKey();
 				double v = f.getValue();
-				xDict.add(x);
-				yDict.add(y);
 
-				Set<String> ys = outNeighborSet.get(x);
-				ys.add(y);
-				outNeighborSet.put(x, ys);
+				if (wordDict.contains(y)) {
+					Set<String> ys = outNeighborSet.get(x);
+					ys.add(y);
+					outNeighborSet.put(x, ys);
+				}
 	//			Set<String> xs = inNeighborSet.get(y);
 	//			xs.add(x);
 	//			inNeighborSet.put(y, xs);
@@ -153,14 +153,28 @@ public class SparseMatrix
 
 		// update non-neighbor set
 		for (String s: xDict) {
-			Set<String> yd = new HashSet<String>();
+/*			Set<String> yd = new HashSet<String>();
 			Set<String> outNS = outNeighborSet.get(s);
-			for (String t: xDict) {
+			for (String t: yDict) {
 				if (!outNS.contains(t)) {
 					yd.add(t);
 				}
 			}
-			outNeighborComplementSet.put(s, yd);
+*/
+			Set<String> outNS = outNeighborSet.get(s);
+			yDict.removeAll(outNS);
+			outNeighborComplementSet.put(s, yDict);
+			yDict.addAll(outNS);
+
+/*			System.out.println("len yd = " + yd.size());
+			yDict.removeAll(outNS);
+			System.out.println("len yd = " + yd.size());
+			System.out.println("len yDict = " + yDict.size());
+			yd.addAll(outNS);
+			System.out.println("len yd = " + yd.size());
+			System.out.println("len yDict = " + yDict.size());
+*/	
+
 		}
 	//	for (String s: yDict) {
 	//		Set<String> xd = new HashSet<String>();
