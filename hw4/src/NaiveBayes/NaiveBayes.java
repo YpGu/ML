@@ -1,4 +1,5 @@
 import java.util.*;
+import java.io.*;
 
 public class NaiveBayes
 {
@@ -33,7 +34,7 @@ public class NaiveBayes
 
 
 	public static int
-	getArgMax(Map<Integer, Double> arr) {
+	getArgMax2(Map<Integer, Double> arr) {
 		int s = arr.size();
 		int maxI = -1;
 		double maxV = -Double.MAX_VALUE;
@@ -43,6 +44,50 @@ public class NaiveBayes
 				maxI = e.getKey();
 			}
 		}
+
+		return maxI;
+	}
+
+	public static boolean
+	greaterThan(double p1, double n1, double p2, double n2) {
+		if (n1 > n2) return true;
+		else if (n1 < n2) return false;
+		else return (p1 > p2);
+	}
+
+	public static int
+	getArgMax(String doc) {
+		int maxI = -1;
+		double maxRatio = 0;
+		double maxUp = -Double.MAX_VALUE;
+
+		for (int k = 1; k < K; k++) {
+			double prob = 1;
+			double numUp = 0, numDown = 0;
+			for (String w: testData.getRow(doc)) {
+				int v = Integer.parseInt(w)-1;
+				prob *= (theta[k][v]/theta[0][v]);
+				while (prob >= 10) {prob *= 0.1; numUp += 1;}
+				while (prob < 1) {prob *= 10; numDown += 1;}
+			}
+			for (String w: testData.getRowComplement(doc)) {
+				int v = Integer.parseInt(w)-1;
+				prob *= ((1-theta[k][v])/(1-theta[0][v]));
+				while (prob >= 10) {prob *= 0.1; numUp += 1;}
+				while (prob < 1) {prob *= 10; numDown += 1;}
+			}
+			prob *= (classPrior[k]/classPrior[0]);
+
+			while (prob >= 10) {prob *= 0.1; numUp += 1;}
+			while (prob < 1) {prob *= 10; numDown += 1;}
+
+//			System.out.println("Ratio = " + prob + " numUp = " + numUp + " numDown = " + numDown);
+			if (greaterThan(prob, numUp-numDown, maxRatio, maxUp)) {
+				maxRatio = prob; maxI = k; maxUp = numUp-numDown;
+			}
+		}
+//		Scanner sc = new Scanner(System.in);
+//		int gu = sc.nextInt();
 
 		return maxI;
 	}
@@ -62,10 +107,28 @@ public class NaiveBayes
 			}
 			numDocumentsInClass[k] += 1;
 		}
+		// class prior
+		for (int k = 0; k < K; k++) {
+			classPrior[k] = (double)numDocumentsInClass[k]/(double)trainData.getDictSize();
+		//	System.out.println("k = " + k + " prior = " + classPrior[k]);
+		}
 		// smoothing 
 		for (int k = 0; k < K; k++) 
 			for (int v = 0; v < V; v++) 
 				theta[k][v] = (theta[k][v] + 1) / (double)(numDocumentsInClass[k] + V);
+
+		/// output 
+		try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter("output.txt")))) {
+			for (int v = 0; v < V; v++) {
+				for (int k = 0; k < K; k++) {
+					writer.printf("%f\t", theta[k][v]);
+				}
+				writer.printf("\n");
+			}
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		return;
 	}
@@ -75,36 +138,41 @@ public class NaiveBayes
 	test() {
 		System.out.println("Testing...");
 		Map<String, Integer> labelSet = testData.getLabelSet();
+		int cor = 0, tot = 0;
 		for (String doc: testData.getDict()) {
+/*
 			Map<Integer, Double> probs = new HashMap<Integer, Double>();		// log of posterior probability for each topic
 			for (int k = 0; k < K; k++) {
-				double prob = 0;
+				double prob = 1;
 				for (String w: testData.getRow(doc)) {
 					int v = Integer.parseInt(w)-1;
-					prob += Math.log(theta[k][v] + Double.MIN_VALUE);
+					prob *= theta[k][v];
 				}
 				for (String w: testData.getRowComplement(doc)) {
-					int v = Integer.parseInt(w);
-					prob += Math.log(1 - theta[k][v] + Double.MIN_VALUE);
+					int v = Integer.parseInt(w)-1;
+					prob *= (1-theta[k][v]);
 				}
-				prob += Math.log(classPrior[k]);
+				prob *= classPrior[k];
 				probs.put(k, prob);
-			}
-			for (Map.Entry<Integer, Double> e: probs.entrySet()) {
-				System.out.println("prob = " + e.getValue());			// TODO: infinity
+				System.out.println("Prob = " + prob);
 			}
 			Scanner sc = new Scanner(System.in);
 			int gu = sc.nextInt();
+			int k = getArgMax2(probs);
+*/
+			int k = getArgMax(doc);
 
-			int k = getArgMax(probs);
 			// check correctness  
 			if (k == labelSet.get(doc)) {
-				System.out.println("Correct!");
+			//	System.out.println("Correct! (" + k + ")");
+				cor += 1; tot += 1;
 			}
 			else {
-				System.out.println("Wrong! Predicted Class = " + k + ", Ground Truth = " + labelSet.get(doc));
+			//	System.out.println("Wrong! Predicted Class = " + k + ", Ground Truth = " + labelSet.get(doc));
+				tot += 1;
 			}
 		}
+		System.out.println("Correct = " + cor + " Total = " + tot);
 	}
 
 	public static void
