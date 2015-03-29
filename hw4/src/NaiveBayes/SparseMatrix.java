@@ -52,14 +52,9 @@ public class SparseMatrix
 	set(String row, String col, double val) {
 		if (!mat.containsKey(row)) {
 			Map<String, Double> m = new HashMap<String, Double>();
-			m.put(col, val);
 			mat.put(row, m);
 		}
-		else {
-			Map<String, Double> m = mat.get(row);
-			m.put(col, val);
-			mat.put(row, m);
-		}
+		mat.get(row).put(col, val);
 		return;
 	}
 
@@ -113,12 +108,7 @@ public class SparseMatrix
 		// init dict set
 		for (Map.Entry<String, Map<String, Double>> e: mat.entrySet()) {
 			String x = e.getKey();
-			Map<String, Double> m = e.getValue();
-			for (Map.Entry<String, Double> f: m.entrySet()) {
-				String y = f.getKey();
-				double v = f.getValue();
-				xDict.add(x);
-			}
+			xDict.add(x);
 		}
 		yDict = wordDict;
 
@@ -127,10 +117,6 @@ public class SparseMatrix
 			outNeighborSet.put(s, new HashSet<String>());
 			outNeighborComplementSet.put(s, new HashSet<String>());
 		}
-	//	for (String s: yDict) {
-	//		inNeighborSet.put(s, new HashSet<String>());
-	//		inNeighborComplementSet.put(s, new HashSet<String>());
-	//	}
 
 		// update neighbor set
 		for (Map.Entry<String, Map<String, Double>> e: mat.entrySet()) {
@@ -141,51 +127,44 @@ public class SparseMatrix
 				double v = f.getValue();
 
 				if (wordDict.contains(y)) {
-					Set<String> ys = outNeighborSet.get(x);
-					ys.add(y);
-					outNeighborSet.put(x, ys);
+					outNeighborSet.get(x).add(y);
+//					Set<String> ys = outNeighborSet.get(x);
+//					ys.add(y);
+//					outNeighborSet.put(x, ys);
 				}
-	//			Set<String> xs = inNeighborSet.get(y);
-	//			xs.add(x);
-	//			inNeighborSet.put(y, xs);
 			}
 		}
 
-		// update non-neighbor set
+/*		// update non-neighbor set
+		Set<String> p = new HashSet<String>();
 		for (String s: xDict) {
-/*			Set<String> yd = new HashSet<String>();
 			Set<String> outNS = outNeighborSet.get(s);
-			for (String t: yDict) {
-				if (!outNS.contains(t)) {
-					yd.add(t);
-				}
-			}
-*/
-			Set<String> outNS = outNeighborSet.get(s);
+			p = outNS;
+
 			yDict.removeAll(outNS);
+			System.out.println("SS SUM = " + (yDict.size() + outNS.size()));
+
 			outNeighborComplementSet.put(s, yDict);
+			System.out.println("A = " + outNeighborComplementSet.get(s).size());
+
 			yDict.addAll(outNS);
+			System.out.println("B = " + outNeighborComplementSet.get(s).size());
 
-/*			System.out.println("len yd = " + yd.size());
-			yDict.removeAll(outNS);
-			System.out.println("len yd = " + yd.size());
-			System.out.println("len yDict = " + yDict.size());
-			yd.addAll(outNS);
-			System.out.println("len yd = " + yd.size());
-			System.out.println("len yDict = " + yDict.size());
-*/	
-
+			int v = outNeighborComplementSet.get(s).size() + outNeighborSet.get(s).size();
+			Scanner sc = new Scanner(System.in);
+			int gu = sc.nextInt();
+			if (v != yDict.size()) {
+				for (String ss: outNS) {
+					if (!yDict.contains(ss)) {
+						System.out.println(ss + " does not in yDict!");
+						int gu = sc.nextInt();
+					}
+				}
+				System.out.println("sum = " + v + " voc size = " + yDict.size());
+				int gu = sc.nextInt();
+			}
 		}
-	//	for (String s: yDict) {
-	//		Set<String> xd = new HashSet<String>();
-	//		Set<String> inNS = inNeighborSet.get(s);
-	//		for (String t: xDict) {
-	//			if (!inNS.contains(t)) {
-	//				xd.add(t);
-	//			}
-	//		}
-	//		inNeighborComplementSet.put(s, xd);
-	//	}
+*/
 	}
 }
 

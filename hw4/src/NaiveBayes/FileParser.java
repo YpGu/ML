@@ -4,29 +4,25 @@ import java.io.*;
 public class FileParser
 {
 	public static void
-	ReadData(SparseMatrix data, String fileDir) {
-		Set<String> terms = new HashSet<String>();
+	ReadData(SparseMatrix data, String fileDir, Set<String> voc) {
 		try (BufferedReader br = new BufferedReader(new FileReader(fileDir))) {
-			int lineID = 0;
 			String currentLine;
 			while ((currentLine = br.readLine()) != null) {
 				// Each line: <docID> <termID> <freq>
 				String[] tokens = currentLine.split(" ");
-				terms.add(tokens[1]);
 				data.set(tokens[0], tokens[1], Double.parseDouble(tokens[2]));
-				lineID += 1;
 			}
 		}
 		catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		data.update();
+		data.update(voc);
 
 		return;
 	}
 
-	public static int 
+	public static int
 	ReadLabel(SparseMatrix data, String fileDir) {
 		Set<Integer> topics = new HashSet<Integer>();
 		try (BufferedReader br = new BufferedReader(new FileReader(fileDir))) {
@@ -45,9 +41,23 @@ public class FileParser
 			e.printStackTrace();
 		}
 
-		data.update();
-
 		return topics.size();
+	}
+
+	public static Set<String>
+	ReadVocabulary(String fileDir) {
+		Set<String> res = new HashSet<String>();
+		try (BufferedReader br = new BufferedReader(new FileReader(fileDir))) {
+			String currentLine;
+			while ((currentLine = br.readLine()) != null) {
+				res.add(currentLine);
+			}
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return res;
 	}
 
 	public static int
