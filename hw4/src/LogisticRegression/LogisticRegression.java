@@ -1,4 +1,5 @@
 import java.util.*;
+import java.io.*;
 
 public class LogisticRegression
 {
@@ -7,15 +8,14 @@ public class LogisticRegression
 	public static double[] label;					// labels
 	public static int K;						// feature dimension
 	public static int N;						// num of data instances
-	public static final int MAX_ITER = 5000;
+	public static final int MAX_ITER = 100000;
 	public static final int MAX_FOLD = 10;
-	public static final boolean WRITE = true;
+	public static final boolean WRITE = false;
 
 //	public static final double lr = 0.000000005;			// spambase, breast cancer
 	public static final double lr = 0.000000001;			// diabete
-//	public static final double epsilon = 0.001;			// spambase
+//	public static final double epsilon = 0.001;			// spambase, brease cancer
 	public static final double epsilon = 0.0001;			// diabete
-//	public static final double epsilon = 0.001;			// breast cancer
 
 
 	public static void
@@ -101,7 +101,15 @@ public class LogisticRegression
 			}
 			// check objective
 			newObj = calcObj(fold);
-			if (iter%1000 == 0) 
+			if (WRITE) {
+				try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter("./convergenceCurve", true)))) {
+					writer.printf("%f\n", newObj);
+				}
+				catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if (iter%10000 == 0) 
 				System.out.println("\tIter " + iter + " Objective function = " + newObj);
 			if (newObj - oldObj < epsilon && iter != 0) {
 				break;
@@ -133,13 +141,14 @@ public class LogisticRegression
 	public static void 
 	main(String[] args) {
 		if (args.length != 1) {
-			System.out.println("Usage: java LogisticRegression ../../data/20news/");
+			System.out.println("Usage: java LogisticRegression ../../data/spambase.csv");
 			System.exit(0);
 		}
 
 		init(args);
 
 		for (int fold = 0; fold < MAX_FOLD; fold++) {
+//			if (fold != 0) break;
 			train(fold);
 			test(fold);
 			
