@@ -42,7 +42,9 @@ public class Perceptron
 	public static void
 	train(int fold) {
 		boolean flag = true;
+		int count = 0;
 		while (true) {
+			count += 1;
 			for (int i = 0; i < N; i++) {
 				if (i%NUM_FOLD == fold) continue;
 				double yi = innerProduct(w, data[i]);
@@ -53,7 +55,9 @@ public class Perceptron
 				}
 			}
 			if (flag) break;
+			flag = true;
 		}
+		System.out.println("Convergence Reached after " + count + " Iteration(s)!");
 
 		return;
 	}
@@ -81,7 +85,7 @@ public class Perceptron
 
 		init(args);
 		for (int fold = 0; fold < NUM_FOLD; fold++) {
-			System.out.println("------ Fold " + fold + " ------");
+			System.out.println("\n------ Fold " + fold + " ------");
 			train(fold);
 			test(fold);
 		}
