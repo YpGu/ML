@@ -1,5 +1,6 @@
 /**
-	KMeans.java: Implementation of K-means algorithm.
+	KMeans.java: Implementation of K-means algorithm
+	Problem: Data points tend to fall into one cluster 
 **/
 
 import java.util.*;
@@ -14,20 +15,11 @@ public class KMeans
 	public static int M;						// feature dimension
 	public static int N;						// num of data instances
 	public static int K;						// num of clusters 
-	public static final int MAX_ITER = 100000;
-	public static final int MAX_FOLD = 10;
-	public static final boolean WRITE = false;
-
-	public static final double lr = 0.000000005;			// spambase, breast cancer
-//	public static final double lr = 0.000000001;			// diabete
-//	public static final double lr = 0.002;				// test
-	public static final double epsilon = 0.001;			// spambase, brease cancer
-//	public static final double epsilon = 0.1;			// diabete
-	public static double lambda;
-
+	public static final int MAX_ITER = 5;
 
 	public static void
 	init(String[] args) {
+		Random rand = new Random();
 		String fileDir = args[0];
 		K = Integer.parseInt(args[1]);
 		N = FileParser.readNumOfInstances(fileDir, ",");
@@ -41,9 +33,9 @@ public class KMeans
 
 		FileParser.readData(fileDir, ",", data, label, M);
 
-		Random rand = new Random(0);
 		for (int n = 0; n < N; n++) 
 			predict[n] = rand.nextInt(K);
+//			predict[n] = label[n];				// alright 
 		updateCenters(data, predict, center);
 
 		return;
@@ -70,7 +62,9 @@ public class KMeans
 				minDistance = dist;
 				res = k;
 			}
+//			System.out.printf("k = %d, dist = %f\t", k, dist);
 		}
+//		System.out.printf("\n");
 
 		return res;
 	}
@@ -96,6 +90,15 @@ public class KMeans
 				center[k][m] /= (double)numElements[k];
 			}
 		}
+		// print
+		if (true) {
+			for (int k = 0; k < K; k++) {
+				System.out.printf("-- cluster %d %d ", k, numElements[k]);
+				for (int m = 0; m < M; m++) 
+					System.out.printf("%f\t", center[k][m]);
+				System.out.printf("\n");
+			}
+		}
 		return;
 	}
 
@@ -104,9 +107,18 @@ public class KMeans
 	train() {
 		for (int iter = 0; iter < MAX_ITER; iter++) {
 			if (iter%100 == 0) System.out.println("Iter = " + iter);
-			for (int n = 0; n < N; n++) 
+			for (int n = 0; n < N; n++) {
 				predict[n] = argMax(data[n], center);
+//				System.out.printf("%d ", predict[n]);
+			}
+			System.out.printf("\n");
 			updateCenters(data, predict, center);
+
+			double e = Evaluation.sumOfSquaredErrors(data, center, predict);
+			System.out.println("err = " + e);
+
+//			Scanner sc = new Scanner(System.in);
+//			int gu = sc.nextInt();
 		}
 
 		return;
