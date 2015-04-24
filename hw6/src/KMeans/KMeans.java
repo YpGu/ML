@@ -18,6 +18,18 @@ public class KMeans
 	public static final int MAX_ITER = 5;
 
 	public static void
+	initCenters(double[][] ctr) {
+		Random rand = new Random(0);
+		for (int k = 0; k < K; k++) {
+			int r = rand.nextInt(N);
+			for (int m = 0; m < M; m++) 
+				ctr[k][m] = data[r][m];
+		}
+
+		return;
+	}
+
+	public static void
 	init(String[] args) {
 		Random rand = new Random();
 		String fileDir = args[0];
@@ -33,11 +45,13 @@ public class KMeans
 
 		FileParser.readData(fileDir, ",", data, label, M);
 
+		initCenters(center);
+/*
 		for (int n = 0; n < N; n++) 
 			predict[n] = rand.nextInt(K);
 //			predict[n] = label[n];				// alright 
 		updateCenters(data, predict, center);
-
+*/
 		return;
 	}
 
