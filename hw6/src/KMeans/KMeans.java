@@ -162,7 +162,7 @@ public class KMeans
 	public static void 
 	main(String[] args) {
 		if (args.length != 2) {
-			System.out.println("Usage: java KMeans ../../data/spambase.csv <cluster_size>");
+			System.out.println("Usage: java KMeans ../../data/yeastData.csv <cluster_size>");
 			System.exit(0);
 		}
 
