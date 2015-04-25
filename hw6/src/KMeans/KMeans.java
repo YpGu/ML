@@ -15,17 +15,27 @@ public class KMeans
 	public static int M;						// feature dimension
 	public static int N;						// num of data instances
 	public static int K;						// num of clusters 
-	public static final int MAX_ITER = 5;
+	public static int K1;						// actual number of clusters 
+	public static final int MAX_ITER = 500;
 
 	public static void
 	initCenters(double[][] ctr) {
-		Random rand = new Random(0);
+		Random rand = new Random();
 		for (int k = 0; k < K; k++) {
 			int r = rand.nextInt(N);
 			for (int m = 0; m < M; m++) 
 				ctr[k][m] = data[r][m];
 		}
 
+/*
+		System.out.println("centers:");
+		for (int k = 0; k < K; k++) {
+			System.out.printf("%d ", k);
+			for (int m = 0; m < M; m++) 
+				System.out.printf("%f\t", ctr[k][m]);
+			System.out.printf("\n");
+		}
+*/
 		return;
 	}
 
@@ -44,14 +54,18 @@ public class KMeans
 		center = new double[K][M];
 
 		FileParser.readData(fileDir, ",", data, label, M);
+		Normalizer.norm(data);
+
+		K1 = 0;
+		for (int n = 0; n < N; n++) {
+			if (label[n] > K1) 
+				K1 = label[n];
+		}
+		K1++;
+		System.out.println("K1 = " + K1);
 
 		initCenters(center);
-/*
-		for (int n = 0; n < N; n++) 
-			predict[n] = rand.nextInt(K);
-//			predict[n] = label[n];				// alright 
-		updateCenters(data, predict, center);
-*/
+
 		return;
 	}
 
@@ -60,7 +74,7 @@ public class KMeans
 	calcDistance(double[] arr1, double[] arr2) {
 		double res = 0;
 		for (int i = 0; i < arr1.length; i++) {
-			res += arr1[i] * arr2[i];
+			res += (arr1[i] - arr2[i]) * (arr1[i] - arr2[i]);
 		}
 		return res;
 	}
@@ -76,9 +90,12 @@ public class KMeans
 				minDistance = dist;
 				res = k;
 			}
-//			System.out.printf("k = %d, dist = %f\t", k, dist);
+//			System.out.printf("k = %d, dist = %f\n", k, dist);
 		}
-//		System.out.printf("\n");
+//		System.out.printf("%d selected\n", res);
+
+		Scanner sc = new Scanner(System.in);
+//		int gu = sc.nextInt();
 
 		return res;
 	}
@@ -105,7 +122,7 @@ public class KMeans
 			}
 		}
 		// print
-		if (true) {
+		if (false) {
 			for (int k = 0; k < K; k++) {
 				System.out.printf("-- cluster %d %d ", k, numElements[k]);
 				for (int m = 0; m < M; m++) 
@@ -119,19 +136,23 @@ public class KMeans
 	// training - assigning clusters to data points 
 	public static void 
 	train() {
+		double oldObj = -1;
 		for (int iter = 0; iter < MAX_ITER; iter++) {
 			if (iter%100 == 0) System.out.println("Iter = " + iter);
 			for (int n = 0; n < N; n++) {
 				predict[n] = argMax(data[n], center);
 //				System.out.printf("%d ", predict[n]);
 			}
-			System.out.printf("\n");
+//			System.out.printf("\n");
 			updateCenters(data, predict, center);
 
 			double e = Evaluation.sumOfSquaredErrors(data, center, predict);
-			System.out.println("err = " + e);
+			double f = Evaluation.normalizedMutualInformation(data, predict, label, K1, K);
+			System.out.println("err = " + e + " nmi = " + f);
+			if (e == oldObj && iter > 2) break;
+			oldObj = e;
 
-//			Scanner sc = new Scanner(System.in);
+			Scanner sc = new Scanner(System.in);
 //			int gu = sc.nextInt();
 		}
 

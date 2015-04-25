@@ -53,6 +53,7 @@ public class FileParser
 					inputs[lineID][i] = curAttr;
 				}
 				outputs[lineID] = Integer.parseInt(tokens[M].trim())-1;			// to make the index start from 0 
+//				if (outputs[lineID] > 2) System.out.println(outputs[lineID]);
 				lineID++;
 			}
 		}
